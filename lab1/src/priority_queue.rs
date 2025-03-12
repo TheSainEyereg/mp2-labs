@@ -17,7 +17,7 @@ impl<T: Ord> PriorityQueue<T> {
 
     pub fn push(&mut self, value: T) {
         self.heap.push(value);
-        self.sift_up(self.heap.len() - 1);
+        self.sift_up();
     }
 
     pub fn pop(&mut self) -> Option<T> {
@@ -29,7 +29,7 @@ impl<T: Ord> PriorityQueue<T> {
         self.heap.swap(0, last);
 
         let result = self.heap.pop();
-        self.sift_down(0);
+        self.sift_down();
 
         result
     }
@@ -38,8 +38,8 @@ impl<T: Ord> PriorityQueue<T> {
         self.heap.first()
     }
 
-    fn sift_up(&mut self, index: usize) {
-        let mut current = index;
+    fn sift_up(&mut self) {
+        let mut current = self.heap.len() - 1;
         while current > 0 {
             let parent = (current - 1) / 2;
             if self.heap[current] <= self.heap[parent] {
@@ -50,8 +50,8 @@ impl<T: Ord> PriorityQueue<T> {
         }
     }
 
-    fn sift_down(&mut self, index: usize) {
-        let mut current = index;
+    fn sift_down(&mut self) {
+        let mut current = 0;
         loop {
             let left = 2 * current + 1;
             let right = 2 * current + 2;
