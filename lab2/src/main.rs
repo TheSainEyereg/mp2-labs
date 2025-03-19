@@ -2,23 +2,29 @@ mod map;
 
 use map::Map;
 
+const KEY: i32 = 6;
+
 fn main() {
-    let mut map: Map<i32, &str> = Map::new();
+    let mut a: Map<i32, &str> = Map::new();
 
-    map.insert(1, "one");
-    map.insert(-2, "minus two");
-    map.insert(3, "three");
-    map.insert(6, "six");
-    map.insert(6, "https://olejka.ru/ss/six.jpg");
+    println!("Is empty: {}", a.is_empty());
 
-    let node = map.find(&6);
+    a.insert(1, "one");
+    a.insert(-2, "minus two");
+    a.insert(3, "three");
+    a.insert(6, "six");
+    a.insert(6, "https://olejka.ru/ss/six.jpg");
 
+    let b = a.clone();
+    drop(a);
+
+    let node = b.get(&KEY);
     match node {
         None => println!("Node with key 6 not found"),
         Some(n) => println!("Value of node with key 6 is: {}", n.borrow().value),
     }
 
-    let node = map.find(&6);
+    let node = b.get(&KEY);
     if let Some(n) = node {
         println!(
             "If borrowed value was returned then you should see it here: {}",

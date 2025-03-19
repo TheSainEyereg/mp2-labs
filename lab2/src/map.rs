@@ -48,7 +48,7 @@ where
         }
     }
 
-    pub fn find(&self, key: &K) -> Option<Rc<RefCell<Node<K, V>>>> {
+    pub fn get(&self, key: &K) -> Option<Rc<RefCell<Node<K, V>>>> {
         Self::find_node(&self.root, key)
     }
 
@@ -70,6 +70,11 @@ where
             }
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.root.is_none()
+    }
+
 }
 
 impl<K, V> Drop for Map<K, V>
@@ -87,3 +92,4 @@ where
         cleanup(self.root.take());
     }
 }
+
