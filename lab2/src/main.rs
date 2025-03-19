@@ -18,6 +18,8 @@ fn main() {
     let b = a.clone();
     drop(a);
 
+    println!("Is empty: {}", b.is_empty());
+
     let node = b.get(&KEY);
     match node {
         None => println!("Node with key 6 not found"),
@@ -30,5 +32,9 @@ fn main() {
             "If borrowed value was returned then you should see it here: {}",
             n.borrow().value
         );
+    }
+
+    for (key, value) in b {
+        println!("Key: {}, Value: {}", key, value);
     }
 }

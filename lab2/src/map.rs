@@ -74,7 +74,6 @@ where
     pub fn is_empty(&self) -> bool {
         self.root.is_none()
     }
-
 }
 
 impl<K, V> Drop for Map<K, V>
@@ -93,3 +92,50 @@ where
     }
 }
 
+pub struct MapIterator<K: Ord, V> {
+    stack: Vec<Rc<RefCell<Node<K, V>>>>,
+}
+
+impl<K, V> Iterator for MapIterator<K, V>
+where
+    K: Ord + Clone,
+    V: Clone,
+{
+    type Item = (K, V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(node) = self.stack.pop() {
+            let node_ref = node.borrow();
+            let result = (node_ref.key.clone(), node_ref.value.clone());
+
+            let mut current = node_ref.right.clone();
+            while let Some(next_node) = current {
+                self.stack.push(next_node.clone());
+                current = next_node.borrow().left.clone();
+            }
+
+            Some(result)
+        } else {
+            None
+        }
+    }
+}
+
+impl<K, V> IntoIterator for Map<K, V>
+where
+    K: Ord + Clone,
+    V: Clone,
+{
+    type Item = (K, V);
+    type IntoIter = MapIterator<K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let mut iter = MapIterator { stack: Vec::new() };
+        let mut current = self.root.clone();
+        while let Some(node) = current {
+            iter.stack.push(node.clone());
+            current = node.borrow().left.clone();
+        }
+        iter
+    }
+}
