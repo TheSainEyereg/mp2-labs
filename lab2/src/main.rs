@@ -20,30 +20,19 @@ fn main() {
     a.insert(7, "seven");
     a.insert(13, "thirteen");
 
-    a.insert(6, "https://olejka.ru/ss/six.jpg");
-
     for (key, value) in a.iter() {
         println!("Key: {}, Value: {}", key, value);
     }
+
+    a.insert(6, "https://olejka.ru/ss/six.jpg");
 
     let b = a.clone();
     drop(a);
 
     println!("Is empty: {}", b.is_empty());
 
-    let value = b.get(&KEY);
-    match value {
-        None => println!("Node with key {} not found", KEY),
-        Some(v) => println!("Value of node with key {} is: {}", KEY, v),
-    }
-
-    let value = b.get(&KEY);
-    if let Some(v) = value {
-        println!(
-            "If borrowed value's ownership was returned, then you should see it here: {}",
-            v
-        );
-    }
+    let value = b[KEY];
+    println!("Value of node with key {} is: {}", KEY, value);
 
     println!("Starting from {} iter is:", KEY);
     for (key, value) in b.find(&KEY) {

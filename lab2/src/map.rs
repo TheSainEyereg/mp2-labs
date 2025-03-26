@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 #[derive(Debug, Clone)]
 pub struct Node<K: Ord, V: Clone> {
     pub key: K,
@@ -46,24 +48,16 @@ where
         }
     }
 
-    pub fn get(&self, key: &K) -> Option<V> {
-        if let Some(node) = Self::find_node(&self.root, key) {
-            Some(node.value)
-        } else {
-            None
-        }
-    }
-
-    fn find_node(node: &Option<Box<Node<K, V>>>, key: &K) -> Option<Box<Node<K, V>>> {
+    fn find_node<'a>(node: Option<&'a Node<K, V>>, key: &K) -> Option<&'a Node<K, V>> {
         match node {
             None => None,
             Some(n) => {
                 if key < &n.key {
-                    Self::find_node(&n.left, key)
+                    Self::find_node(n.left.as_deref(), key)
                 } else if key > &n.key {
-                    Self::find_node(&n.right, key)
+                    Self::find_node(n.right.as_deref(), key)
                 } else {
-                    Some(n.clone())
+                    Some(n)
                 }
             }
         }
@@ -71,10 +65,10 @@ where
 
     pub fn find(&self, key: &K) -> MapIterator<K, V> {
         let mut iter = MapIterator { stack: Vec::new() };
-        let mut current = Self::find_node(&self.root, key);
+        let mut current = Self::find_node(self.root.as_deref(), key);
         while let Some(node) = current {
             iter.stack.push(node.clone());
-            current = node.left.clone();
+            current = node.left.as_deref();
         }
         iter
     }
@@ -85,17 +79,17 @@ where
 
     pub fn iter(&self) -> MapIterator<K, V> {
         let mut iter = MapIterator { stack: Vec::new() };
-        let mut current = self.root.clone();
+        let mut current = self.root.as_deref();
         while let Some(node) = current {
             iter.stack.push(node.clone());
-            current = node.left.clone();
+            current = node.left.as_deref();
         }
         iter
     }
 }
 
 pub struct MapIterator<K: Ord, V: Clone> {
-    stack: Vec<Box<Node<K, V>>>,
+    stack: Vec<Node<K, V>>,
 }
 
 impl<K, V> Iterator for MapIterator<K, V>
@@ -109,10 +103,10 @@ where
         if let Some(node) = self.stack.pop() {
             let result = (node.key.clone(), node.value.clone());
 
-            let mut current = node.right.clone();
+            let mut current = node.right.as_deref();
             while let Some(next_node) = current {
                 self.stack.push(next_node.clone());
-                current = next_node.left.clone();
+                current = next_node.left.as_deref();
             }
 
             Some(result)
@@ -132,5 +126,19 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
+    }
+}
+
+impl<K, V> Index<K> for Map<K, V>
+where
+    K: Ord + Clone,
+    V: Clone,
+{
+    type Output = V;
+
+    fn index(&self, index: K) -> &Self::Output {
+        &Self::find_node(self.root.as_deref(), &index)
+            .expect("Key {index} out of bounds")
+            .value
     }
 }
