@@ -1,7 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 #[derive(Debug, Clone)]
-pub struct Node<K: Ord, V> {
+pub struct Node<K: Ord, V: Copy> {
     pub key: K,
     pub value: V,
     left: Option<Rc<RefCell<Node<K, V>>>>,
@@ -9,13 +9,14 @@ pub struct Node<K: Ord, V> {
 }
 
 #[derive(Debug, Clone)]
-pub struct Map<K: Ord, V> {
+pub struct Map<K: Ord, V: Copy> {
     root: Option<Rc<RefCell<Node<K, V>>>>,
 }
 
 impl<K, V> Map<K, V>
 where
     K: Ord,
+    V: Copy,
 {
     pub fn new() -> Self {
         Map { root: None }
@@ -48,8 +49,12 @@ where
         }
     }
 
-    pub fn get(&self, key: &K) -> Option<Rc<RefCell<Node<K, V>>>> {
-        Self::find_node(&self.root, key)
+    pub fn get(&self, key: &K) -> Option<V> {
+        if let Some(node) = Self::find_node(&self.root, key) {
+            Some(node.borrow().value)
+        } else {
+            None
+        }
     }
 
     fn find_node(
@@ -96,27 +101,14 @@ where
     }
 }
 
-// ToDo: implement indexing
-// impl<K, V> Index<&K> for Map<K, V>
-// where
-//     K: Ord,
-// {
-//     type Output = V;
-
-//     fn index(&self, key: &K) -> V {
-//         let node = self.get(key).unwrap();
-//         node.clone().borrow().value
-//     }
-// }
-
-pub struct MapIterator<K: Ord, V> {
+pub struct MapIterator<K: Ord, V: Copy> {
     stack: Vec<Rc<RefCell<Node<K, V>>>>,
 }
 
 impl<K, V> Iterator for MapIterator<K, V>
 where
     K: Ord + Clone,
-    V: Clone,
+    V: Clone + Copy,
 {
     type Item = (K, V);
 
@@ -141,7 +133,7 @@ where
 impl<K, V> IntoIterator for Map<K, V>
 where
     K: Ord + Clone,
-    V: Clone,
+    V: Clone + Copy,
 {
     type Item = (K, V);
     type IntoIter = MapIterator<K, V>;

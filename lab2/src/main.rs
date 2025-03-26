@@ -31,27 +31,28 @@ fn main() {
 
     println!("Is empty: {}", b.is_empty());
 
-    let node = b.get(&KEY);
-    match node {
-        None => println!("Node with key 6 not found"),
-        Some(n) => println!("Value of node with key 6 is: {}", n.borrow().value),
+    let value = b.get(&KEY);
+    match value {
+        None => println!("Node with key {} not found", KEY),
+        Some(v) => println!("Value of node with key {} is: {}", KEY, v),
     }
 
-    let node = b.get(&KEY);
-    if let Some(n) = node {
+    let value = b.get(&KEY);
+    if let Some(v) = value {
         println!(
-            "If borrowed value was returned then you should see it here: {}",
-            n.borrow().value
+            "If borrowed value's ownership was returned, then you should see it here: {}",
+            v
         );
     }
 
-    println!("Starting from 6 iter is:");
+    println!("Starting from {} iter is:", KEY);
     for (key, value) in b.find(&KEY) {
         println!("Key: {}, Value: {}", key, value);
     }
 
     println!("Full BST:");
     for (key, value) in b {
+        // At this point b is moved and destroyed
         println!("Key: {}, Value: {}", key, value);
     }
 }
