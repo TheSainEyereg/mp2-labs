@@ -74,6 +74,16 @@ where
     pub fn is_empty(&self) -> bool {
         self.root.is_none()
     }
+
+    pub fn iter(&self) -> MapIterator<K, V> {
+        let mut iter = MapIterator { stack: Vec::new() };
+        let mut current = self.root.clone();
+        while let Some(node) = current {
+            iter.stack.push(node.clone());
+            current = node.borrow().left.clone();
+        }
+        iter
+    }
 }
 
 impl<K, V> Drop for Map<K, V>
@@ -130,12 +140,6 @@ where
     type IntoIter = MapIterator<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let mut iter = MapIterator { stack: Vec::new() };
-        let mut current = self.root.clone();
-        while let Some(node) = current {
-            iter.stack.push(node.clone());
-            current = node.borrow().left.clone();
-        }
-        iter
+        self.iter()
     }
 }

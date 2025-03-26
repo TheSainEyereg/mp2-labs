@@ -9,11 +9,22 @@ fn main() {
 
     println!("Is empty: {}", a.is_empty());
 
-    a.insert(1, "one");
+    a.insert(8, "eight");
     a.insert(-2, "minus two");
     a.insert(3, "three");
+    a.insert(10, "ten");
+    a.insert(1, "one");
     a.insert(6, "six");
+    a.insert(14, "fourteen");
+    a.insert(4, "four");
+    a.insert(7, "seven");
+    a.insert(13, "thirteen");
+
     a.insert(6, "https://olejka.ru/ss/six.jpg");
+
+    for (key, value) in a.iter() {
+        println!("Key: {}, Value: {}", key, value);
+    }
 
     let b = a.clone();
     drop(a);
