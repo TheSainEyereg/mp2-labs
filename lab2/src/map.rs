@@ -86,22 +86,6 @@ where
     }
 }
 
-impl<K, V> Drop for Map<K, V>
-where
-    K: Ord,
-{
-    fn drop(&mut self) {
-        fn cleanup<K: Ord, V>(node: Option<Rc<RefCell<Node<K, V>>>>) {
-            if let Some(n) = node {
-                let mut n_ref = n.borrow_mut();
-                cleanup(n_ref.left.take());
-                cleanup(n_ref.right.take());
-            }
-        }
-        cleanup(self.root.take());
-    }
-}
-
 pub struct MapIterator<K: Ord, V> {
     stack: Vec<Rc<RefCell<Node<K, V>>>>,
 }
