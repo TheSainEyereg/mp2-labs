@@ -45,6 +45,12 @@ fn main() {
         );
     }
 
+    println!("Starting from 6 iter is:");
+    for (key, value) in b.find(&KEY) {
+        println!("Key: {}, Value: {}", key, value);
+    }
+
+    println!("Full BST:");
     for (key, value) in b {
         println!("Key: {}, Value: {}", key, value);
     }

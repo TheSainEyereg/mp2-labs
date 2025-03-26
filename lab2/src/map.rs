@@ -71,6 +71,16 @@ where
         }
     }
 
+    pub fn find(&self, key: &K) -> MapIterator<K, V> {
+        let mut iter = MapIterator { stack: Vec::new() };
+        let mut current = Self::find_node(&self.root, key);
+        while let Some(node) = current {
+            iter.stack.push(node.clone());
+            current = node.borrow().left.clone();
+        }
+        iter
+    }
+
     pub fn is_empty(&self) -> bool {
         self.root.is_none()
     }
@@ -85,6 +95,19 @@ where
         iter
     }
 }
+
+// ToDo: implement indexing
+// impl<K, V> Index<&K> for Map<K, V>
+// where
+//     K: Ord,
+// {
+//     type Output = V;
+
+//     fn index(&self, key: &K) -> V {
+//         let node = self.get(key).unwrap();
+//         node.clone().borrow().value
+//     }
+// }
 
 pub struct MapIterator<K: Ord, V> {
     stack: Vec<Rc<RefCell<Node<K, V>>>>,
