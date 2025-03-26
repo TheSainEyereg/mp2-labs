@@ -1,22 +1,20 @@
-use std::{cell::RefCell, rc::Rc};
-
 #[derive(Debug, Clone)]
-pub struct Node<K: Ord, V: Copy> {
+pub struct Node<K: Ord, V: Clone> {
     pub key: K,
     pub value: V,
-    left: Option<Rc<RefCell<Node<K, V>>>>,
-    right: Option<Rc<RefCell<Node<K, V>>>>,
+    left: Option<Box<Node<K, V>>>,
+    right: Option<Box<Node<K, V>>>,
 }
 
 #[derive(Debug, Clone)]
-pub struct Map<K: Ord, V: Copy> {
-    root: Option<Rc<RefCell<Node<K, V>>>>,
+pub struct Map<K: Ord, V: Clone> {
+    root: Option<Box<Node<K, V>>>,
 }
 
 impl<K, V> Map<K, V>
 where
-    K: Ord,
-    V: Copy,
+    K: Ord + Clone,
+    V: Clone,
 {
     pub fn new() -> Self {
         Map { root: None }
@@ -26,24 +24,23 @@ where
         Self::insert_node(&mut self.root, key, value);
     }
 
-    fn insert_node(node: &mut Option<Rc<RefCell<Node<K, V>>>>, key: K, value: V) {
+    fn insert_node(node: &mut Option<Box<Node<K, V>>>, key: K, value: V) {
         match node {
             None => {
-                *node = Some(Rc::new(RefCell::new(Node {
+                *node = Some(Box::new(Node {
                     key,
                     value,
                     left: None,
                     right: None,
-                })));
+                }));
             }
             Some(n) => {
-                let mut n_ref = n.borrow_mut();
-                if key < n_ref.key {
-                    Self::insert_node(&mut n_ref.left, key, value);
-                } else if key > n_ref.key {
-                    Self::insert_node(&mut n_ref.right, key, value);
+                if key < n.key {
+                    Self::insert_node(&mut n.left, key, value);
+                } else if key > n.key {
+                    Self::insert_node(&mut n.right, key, value);
                 } else {
-                    n_ref.value = value;
+                    n.value = value;
                 }
             }
         }
@@ -51,24 +48,20 @@ where
 
     pub fn get(&self, key: &K) -> Option<V> {
         if let Some(node) = Self::find_node(&self.root, key) {
-            Some(node.borrow().value)
+            Some(node.value)
         } else {
             None
         }
     }
 
-    fn find_node(
-        node: &Option<Rc<RefCell<Node<K, V>>>>,
-        key: &K,
-    ) -> Option<Rc<RefCell<Node<K, V>>>> {
+    fn find_node(node: &Option<Box<Node<K, V>>>, key: &K) -> Option<Box<Node<K, V>>> {
         match node {
             None => None,
             Some(n) => {
-                let n_ref = n.borrow();
-                if key < &n_ref.key {
-                    Self::find_node(&n_ref.left, key)
-                } else if key > &n_ref.key {
-                    Self::find_node(&n_ref.right, key)
+                if key < &n.key {
+                    Self::find_node(&n.left, key)
+                } else if key > &n.key {
+                    Self::find_node(&n.right, key)
                 } else {
                     Some(n.clone())
                 }
@@ -81,7 +74,7 @@ where
         let mut current = Self::find_node(&self.root, key);
         while let Some(node) = current {
             iter.stack.push(node.clone());
-            current = node.borrow().left.clone();
+            current = node.left.clone();
         }
         iter
     }
@@ -95,32 +88,31 @@ where
         let mut current = self.root.clone();
         while let Some(node) = current {
             iter.stack.push(node.clone());
-            current = node.borrow().left.clone();
+            current = node.left.clone();
         }
         iter
     }
 }
 
-pub struct MapIterator<K: Ord, V: Copy> {
-    stack: Vec<Rc<RefCell<Node<K, V>>>>,
+pub struct MapIterator<K: Ord, V: Clone> {
+    stack: Vec<Box<Node<K, V>>>,
 }
 
 impl<K, V> Iterator for MapIterator<K, V>
 where
     K: Ord + Clone,
-    V: Clone + Copy,
+    V: Clone,
 {
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(node) = self.stack.pop() {
-            let node_ref = node.borrow();
-            let result = (node_ref.key.clone(), node_ref.value.clone());
+            let result = (node.key.clone(), node.value.clone());
 
-            let mut current = node_ref.right.clone();
+            let mut current = node.right.clone();
             while let Some(next_node) = current {
                 self.stack.push(next_node.clone());
-                current = next_node.borrow().left.clone();
+                current = next_node.left.clone();
             }
 
             Some(result)
@@ -133,7 +125,7 @@ where
 impl<K, V> IntoIterator for Map<K, V>
 where
     K: Ord + Clone,
-    V: Clone + Copy,
+    V: Clone,
 {
     type Item = (K, V);
     type IntoIter = MapIterator<K, V>;
