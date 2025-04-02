@@ -1,9 +1,9 @@
 use std::ops::Index;
 
 #[derive(Debug, Clone)]
-pub struct Node<K: Ord, V: Clone> {
-    pub key: K,
-    pub value: V,
+struct Node<K: Ord, V: Clone> {
+    key: K,
+    value: V,
     left: Option<Box<Node<K, V>>>,
     right: Option<Box<Node<K, V>>>,
 }
