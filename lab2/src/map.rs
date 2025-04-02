@@ -63,18 +63,27 @@ where
         }
     }
 
-    pub fn find(&self, key: &K) -> MapIterator<K, V> {
+    pub fn find(&self, key: &K) -> Option<MapIterator<K, V>> {
         let mut iter = MapIterator { stack: Vec::new() };
         let mut current = Self::find_node(self.root.as_deref(), key);
+
+        if current.is_none() {
+            return None;
+        }
+
         while let Some(node) = current {
             iter.stack.push(node.clone());
             current = node.left.as_deref();
         }
-        iter
+        Some(iter)
     }
 
     pub fn is_empty(&self) -> bool {
         self.root.is_none()
+    }
+
+    pub fn clear(&mut self) {
+        self.root = None;
     }
 
     pub fn iter(&self) -> MapIterator<K, V> {

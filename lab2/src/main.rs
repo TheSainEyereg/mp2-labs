@@ -7,8 +7,6 @@ const KEY: i32 = 6;
 fn main() {
     let mut a: Map<i32, &str> = Map::new();
 
-    println!("Is empty: {}", a.is_empty());
-
     a.insert(8, "eight");
     a.insert(-2, "minus two");
     a.insert(3, "three");
@@ -27,15 +25,20 @@ fn main() {
     a.insert(6, "https://olejka.ru/ss/six.jpg");
 
     let b = a.clone();
+
+    a.clear();
+
+    println!("Is \"a\" empty: {}", a.is_empty());
+
     drop(a);
 
-    println!("Is empty: {}", b.is_empty());
+    println!("Is \"b\" empty: {}", b.is_empty());
 
     let value = b[KEY];
     println!("Value of node with key {} is: {}", KEY, value);
 
     println!("Starting from {} iter is:", KEY);
-    for (key, value) in b.find(&KEY) {
+    for (key, value) in b.find(&KEY).unwrap() {
         println!("Key: {}, Value: {}", key, value);
     }
 
