@@ -125,9 +125,7 @@ where
     }
 
     pub fn find(&self, key: &K) -> BtreeIterator<K, V> {
-        let mut iter = BtreeIterator {
-            stack: Vec::new(),
-        };
+        let mut iter = BtreeIterator { stack: Vec::new() };
 
         if let Some(root) = &self.root {
             if let Some((node, index)) = Self::find_node(Some(root), key) {
@@ -221,8 +219,8 @@ where
 {
     type Output = V;
     fn index(&self, index: K) -> &Self::Output {
-        let (node, i) = Self::find_node(self.root.as_ref(), &index)
-            .expect("Key {index} out of bounds");
+        let (node, i) =
+            Self::find_node(self.root.as_ref(), &index).expect("Key {index} out of bounds");
 
         &node.keys[i].1
     }
