@@ -1,4 +1,4 @@
-use std::ops::Index;
+use std::{cmp, ops::Index};
 
 #[derive(Debug, Clone)]
 struct Node<K: Ord, V: Clone> {
@@ -6,6 +6,7 @@ struct Node<K: Ord, V: Clone> {
     value: V,
     left: Option<Box<Node<K, V>>>,
     right: Option<Box<Node<K, V>>>,
+    height: isize,
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +27,62 @@ where
         Self::insert_node(&mut self.root, key, value);
     }
 
+    fn height(node: &Option<Box<Node<K, V>>>) -> isize {
+        node.as_ref().map_or(-1, |n| n.height)
+    }
+
+    fn balance_factor(node: &Option<Box<Node<K, V>>>) -> isize {
+        match node {
+            Some(n) => Self::height(&n.right) - Self::height(&n.left),
+            None => 0,
+        }
+    }
+
+    fn update_height(node: &mut Box<Node<K, V>>) {
+        node.height = 1 + cmp::max(Self::height(&node.right), Self::height(&node.left));
+    }
+
+    fn rotate_left(mut node: Box<Node<K, V>>) -> Box<Node<K, V>> {
+        let mut new_root = node.right.take().unwrap();
+        node.right = new_root.left.take();
+        Self::update_height(&mut node);
+        new_root.left = Some(node);
+        Self::update_height(&mut new_root);
+        new_root
+    }
+
+    fn rotate_right(mut node: Box<Node<K, V>>) -> Box<Node<K, V>> {
+        let mut new_root = node.left.take().unwrap();
+        node.left = new_root.right.take();
+        Self::update_height(&mut node);
+        new_root.right = Some(node);
+        Self::update_height(&mut new_root);
+        new_root
+    }
+
+    fn balance(node: Option<Box<Node<K, V>>>) -> Option<Box<Node<K, V>>> {
+        let mut node = node?;
+        let balance = Self::balance_factor(&Some(node.clone()));
+
+        if balance > 1 {
+            let right_balance = Self::balance_factor(&node.right);
+            if right_balance < 0 {
+                node.right = Some(Self::rotate_right(node.right.take().unwrap()));
+            }
+            return Some(Self::rotate_left(node));
+        }
+
+        if balance < -1 {
+            let left_balance = Self::balance_factor(&node.left);
+            if left_balance > 0 {
+                node.left = Some(Self::rotate_left(node.left.take().unwrap()));
+            }
+            return Some(Self::rotate_right(node));
+        }
+
+        Some(node)
+    }
+
     fn insert_node(node: &mut Option<Box<Node<K, V>>>, key: K, value: V) {
         match node {
             None => {
@@ -34,6 +91,7 @@ where
                     value,
                     left: None,
                     right: None,
+                    height: 0,
                 }));
             }
             Some(n) => {
@@ -43,7 +101,10 @@ where
                     Self::insert_node(&mut n.right, key, value);
                 } else {
                     n.value = value;
+                    return;
                 }
+                Self::update_height(n);
+                *node = Self::balance(node.take());
             }
         }
     }
