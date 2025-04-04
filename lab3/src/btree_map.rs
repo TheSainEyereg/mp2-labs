@@ -127,35 +127,11 @@ where
     pub fn find(&self, key: &K) -> BtreeIterator<K, V> {
         let mut iter = BtreeIterator { stack: Vec::new() };
 
-        if let Some(root) = &self.root {
-            if let Some((node, index)) = Self::find_node(Some(root), key) {
-                iter.stack.push((node.clone(), index));
-
-                if !node.leaf && index + 1 < node.children.len() {
-                    let mut current = node.children[index + 1].clone();
-                    while !current.leaf {
-                        iter.stack.push((current.clone(), 0));
-                        current = current.children[0].clone();
-                    }
-                    iter.stack.push((current, 0));
-                }
-            }
-        }
-
         iter
     }
 
     pub fn iter(&self) -> BtreeIterator<K, V> {
         let mut iter = BtreeIterator { stack: Vec::new() };
-
-        if let Some(root) = &self.root {
-            let mut current = root.clone();
-            while !current.leaf {
-                iter.stack.push((current.clone(), 0));
-                current = current.children[0].clone();
-            }
-            iter.stack.push((current, 0));
-        }
 
         iter
     }
@@ -163,7 +139,7 @@ where
 
 #[derive(Debug)]
 pub struct BtreeIterator<K: Ord, V: Clone> {
-    stack: Vec<(Node<K, V>, usize)>,
+    stack: Vec<(K, V)>,
 }
 
 impl<K, V> Iterator for BtreeIterator<K, V>
@@ -174,26 +150,8 @@ where
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some((node, mut index)) = self.stack.pop() {
-            if index < node.keys.len() {
-                let result = node.keys[index].clone();
-
-                if !node.leaf && index < node.children.len() {
-                    let mut current = node.children[index + 1].clone();
-                    while !current.leaf {
-                        self.stack.push((current.clone(), 0));
-                        current = current.children[0].clone();
-                    }
-                    self.stack.push((current, 0));
-                }
-
-                index += 1;
-                if index < node.keys.len() || !node.leaf {
-                    self.stack.push((node, index));
-                }
-
-                return Some(result);
-            }
+        while let Some(result) = self.stack.pop() {
+            return Some(result);
         }
         None
     }
