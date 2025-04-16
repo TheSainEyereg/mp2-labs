@@ -23,6 +23,14 @@ where
         Map { root: None }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.root.is_none()
+    }
+
+    pub fn clear(&mut self) {
+        self.root = None;
+    }
+
     pub fn insert(&mut self, key: K, value: V) {
         Self::insert_node(&mut self.root, key, value);
     }
@@ -124,6 +132,58 @@ where
         }
     }
 
+    pub fn remove(&mut self, key: &K) {
+        Self::remove_node(&mut self.root, key);
+    }
+
+    fn remove_node(node: &mut Option<Box<Node<K, V>>>, key: &K) {
+        if let Some(mut n) = node.take() {
+            if key < &n.key {
+                Self::remove_node(&mut n.left, key);
+            } else if key > &n.key {
+                Self::remove_node(&mut n.right, key);
+            } else {
+                if n.left.is_none() {
+                    *node = n.right;
+                    return;
+                } else if n.right.is_none() {
+                    *node = n.left;
+                    return;
+                } else {
+                    // Узел с двумя детьми
+                    let min_node = Self::find_min(&mut n.right);
+                    n.key = min_node.key.clone();
+                    n.value = min_node.value.clone();
+                    Self::remove_node(&mut n.right, &n.key);
+                }
+            }
+            Self::update_height(&mut n);
+            *node = Self::balance(Some(n));
+        }
+    }
+
+    fn find_min(node: &mut Option<Box<Node<K, V>>>) -> Box<Node<K, V>> {
+        let mut current = node.take().unwrap();
+        if current.left.is_none() {
+            *node = current.right.take();
+            return current;
+        }
+        let min = Self::find_min(&mut current.left);
+        Self::update_height(&mut current);
+        *node = Self::balance(Some(current));
+        min
+    }
+
+    pub fn iter(&self) -> MapIterator<K, V> {
+        let mut iter = MapIterator { stack: Vec::new() };
+        let mut current = self.root.as_deref();
+        while let Some(node) = current {
+            iter.stack.push(node.clone());
+            current = node.left.as_deref();
+        }
+        iter
+    }
+
     pub fn find(&self, key: &K) -> Option<MapIterator<K, V>> {
         let mut iter = MapIterator { stack: Vec::new() };
         let mut current = Self::find_node(self.root.as_deref(), key);
@@ -137,24 +197,6 @@ where
             current = node.left.as_deref();
         }
         Some(iter)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.root.is_none()
-    }
-
-    pub fn clear(&mut self) {
-        self.root = None;
-    }
-
-    pub fn iter(&self) -> MapIterator<K, V> {
-        let mut iter = MapIterator { stack: Vec::new() };
-        let mut current = self.root.as_deref();
-        while let Some(node) = current {
-            iter.stack.push(node.clone());
-            current = node.left.as_deref();
-        }
-        iter
     }
 }
 

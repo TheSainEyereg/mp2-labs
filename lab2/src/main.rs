@@ -24,7 +24,7 @@ fn main() {
 
     a.insert(6, "https://olejka.ru/ss/six.jpg");
 
-    let b = a.clone();
+    let mut b = a.clone();
 
     a.clear();
 
@@ -41,6 +41,8 @@ fn main() {
     for (key, value) in b.find(&KEY).unwrap() {
         println!("Key: {}, Value: {}", key, value);
     }
+
+    b.remove(&KEY);
 
     println!("Full BST:");
     for (key, value) in b {
