@@ -124,44 +124,44 @@ where
         }
     }
 
-    pub fn find(&self, key: &K) -> BtreeIterator<K, V> {
-        BtreeIterator { stack: Vec::new() }
-    }
+    // pub fn iter(&self) -> BtreeIterator<K, V> {
+    //     BtreeIterator { stack: Vec::new() }
+    // }
 
-    pub fn iter(&self) -> BtreeIterator<K, V> {
-        BtreeIterator { stack: Vec::new() }
-    }
+    // pub fn find(&self, key: &K) -> BtreeIterator<K, V> {
+    //     BtreeIterator { stack: Vec::new() }
+    // }
 }
 
-#[derive(Debug)]
-pub struct BtreeIterator<K: Ord, V: Clone> {
-    stack: Vec<(K, V)>,
-}
+// #[derive(Debug)]
+// pub struct BtreeIterator<K: Ord, V: Clone> {
+//     stack: Vec<(K, V)>,
+// }
 
-impl<K, V> Iterator for BtreeIterator<K, V>
-where
-    K: Ord + Clone,
-    V: Clone,
-{
-    type Item = (K, V);
+// impl<K, V> Iterator for BtreeIterator<K, V>
+// where
+//     K: Ord + Clone,
+//     V: Clone,
+// {
+//     type Item = (K, V);
 
-    fn next(&mut self) -> Option<Self::Item> {
-        None
-    }
-}
+//     fn next(&mut self) -> Option<Self::Item> {
+//         None
+//     }
+// }
 
-impl<K, V> IntoIterator for BtreeMap<K, V>
-where
-    K: Ord + Clone,
-    V: Clone,
-{
-    type Item = (K, V);
-    type IntoIter = BtreeIterator<K, V>;
+// impl<K, V> IntoIterator for BtreeMap<K, V>
+// where
+//     K: Ord + Clone,
+//     V: Clone,
+// {
+//     type Item = (K, V);
+//     type IntoIter = BtreeIterator<K, V>;
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
+//     fn into_iter(self) -> Self::IntoIter {
+//         self.iter()
+//     }
+// }
 
 impl<K, V> Index<K> for BtreeMap<K, V>
 where

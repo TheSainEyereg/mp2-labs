@@ -18,9 +18,9 @@ fn main() {
     a.insert(7, "seven");
     a.insert(13, "thirteen");
 
-    for (key, value) in a.iter() {
-        println!("Key: {}, Value: {}", key, value);
-    }
+    // for (key, value) in a.iter() {
+    //     println!("Key: {}, Value: {}", key, value);
+    // }
 
     a.insert(6, "https://olejka.ru/ss/six.jpg");
 
@@ -37,14 +37,14 @@ fn main() {
     let value = b[KEY];
     println!("Value of node with key {} is: {}", KEY, value);
 
-    println!("Starting from {} iter is:", KEY);
-    for (key, value) in b.find(&KEY) {
-        println!("Key: {}, Value: {}", key, value);
-    }
+    // println!("Starting from {} iter is:", KEY);
+    // for (key, value) in b.find(&KEY) {
+    //     println!("Key: {}, Value: {}", key, value);
+    // }
 
-    println!("Full BST:");
-    for (key, value) in b {
-        // At this point b is moved and destroyed
-        println!("Key: {}, Value: {}", key, value);
-    }
+    // println!("Full BST:");
+    // for (key, value) in b {
+    //     // At this point b is moved and destroyed
+    //     println!("Key: {}, Value: {}", key, value);
+    // }
 }
