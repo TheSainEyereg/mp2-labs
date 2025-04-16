@@ -125,15 +125,11 @@ where
     }
 
     pub fn find(&self, key: &K) -> BtreeIterator<K, V> {
-        let mut iter = BtreeIterator { stack: Vec::new() };
-
-        iter
+        BtreeIterator { stack: Vec::new() }
     }
 
     pub fn iter(&self) -> BtreeIterator<K, V> {
-        let mut iter = BtreeIterator { stack: Vec::new() };
-
-        iter
+        BtreeIterator { stack: Vec::new() }
     }
 }
 
@@ -150,9 +146,6 @@ where
     type Item = (K, V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(result) = self.stack.pop() {
-            return Some(result);
-        }
         None
     }
 }
