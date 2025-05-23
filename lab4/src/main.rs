@@ -2,7 +2,7 @@ mod hash_map;
 use hash_map::HashMap;
 
 fn main() {
-    let mut map: HashMap<&str, &str> = HashMap::new(16);
+    let mut map: HashMap<&str, &str> = HashMap::default();
 
     println!("Is empty: {}", map.is_empty());
     println!("Curent load factor is: {}", map.max_load_factor());

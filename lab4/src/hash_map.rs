@@ -15,15 +15,6 @@ where
     hasher: H,
 }
 
-impl<K, V> HashMap<K, V>
-where
-    K: Hash + Eq,
-{
-    pub fn new(capacity: usize) -> Self {
-        Self::with_capacity_and_hasher(capacity, BuildHasherDefault::default())
-    }
-}
-
 impl<K, V, H> HashMap<K, V, H>
 where
     K: Hash + Eq,
@@ -175,6 +166,25 @@ where
             .iter_mut()
             .find(|(k, _)| k == key)
             .map(|(_, v)| v)
+    }
+}
+
+impl<K, V> HashMap<K, V>
+where
+    K: Hash + Eq,
+{
+    pub fn new(capacity: usize) -> Self {
+        Self::with_capacity_and_hasher(capacity, BuildHasherDefault::default())
+    }
+}
+
+impl <K,V> Default for HashMap<K, V> 
+where
+    K: Hash + Eq
+
+{
+    fn default() -> Self {
+        HashMap::new(16)
     }
 }
 
