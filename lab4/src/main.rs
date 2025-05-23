@@ -9,7 +9,7 @@ fn main() {
 
     map.insert("one", "In russian it's \"один\"");
     map.insert("phone", "+1 555 987 65 43");
-    map.insert("alert", "Уведомление о высилении");
+    map.insert("alert", "Уведомление о выселении");
 
     println!("Is empty: {}", map.is_empty());
     println!("Curent length: {}", map.len());
