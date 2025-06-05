@@ -178,10 +178,9 @@ where
     }
 }
 
-impl <K,V> Default for HashMap<K, V> 
+impl<K, V> Default for HashMap<K, V>
 where
-    K: Hash + Eq
-
+    K: Hash + Eq,
 {
     fn default() -> Self {
         HashMap::new(16)
